@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"log"
 	"time"
 
 	apimeta "k8s.io/apimachinery/pkg/api/meta"
@@ -24,7 +25,7 @@ import (
 	"sigs.k8s.io/custom-metrics-apiserver/pkg/provider/helpers"
 )
 
-var _ provider.CustomMetricsProvider = &yourProvider{}
+var _ provider.CustomMetricsProvider = (*yourProvider)(nil)
 
 type yourProvider struct {
 	defaults.DefaultCustomMetricsProvider
@@ -45,6 +46,7 @@ func NewProvider(client dynamic.Interface, mapper apimeta.RESTMapper) provider.C
 }
 
 func (p *yourProvider) GetMetricByName(ctx context.Context, name types.NamespacedName, info provider.CustomMetricInfo, metricSelector labels.Selector) (*custom_metrics.MetricValue, error) {
+	log.Println("GetMetricByName:", name, "; metric selector:", metricSelector)
 	value, err := p.valueFor(info)
 	if err != nil {
 		return nil, err
@@ -53,6 +55,7 @@ func (p *yourProvider) GetMetricByName(ctx context.Context, name types.Namespace
 }
 
 func (p *yourProvider) GetMetricBySelector(ctx context.Context, namespace string, selector labels.Selector, info provider.CustomMetricInfo, metricSelector labels.Selector) (*custom_metrics.MetricValueList, error) {
+	log.Println("GetMetricBySelector, namespace:", namespace, "; selector:", selector, "; metric selector:", metricSelector)
 	totalValue, err := p.valueFor(info)
 	if err != nil {
 		return nil, err
