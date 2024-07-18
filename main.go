@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"log"
 	"os"
 
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -42,18 +43,23 @@ func main() {
 
 	klog.Infof(cmd.Message)
 	if err := cmd.Run(wait.NeverStop); err != nil {
+		log.Printf("unable to run custom metrics adapter: %v\n", err)
 		klog.Fatalf("unable to run custom metrics adapter: %v", err)
+	} else {
+		log.Println("provider running")
 	}
 }
 
 func (a *YourAdapter) makeProviderOrDie() provider.CustomMetricsProvider {
 	client, err := a.DynamicClient()
 	if err != nil {
+		log.Printf("unable to construct dynamic client: %v\n", err)
 		klog.Fatalf("unable to construct dynamic client: %v", err)
 	}
 
 	mapper, err := a.RESTMapper()
 	if err != nil {
+		log.Printf("unable to construct discovery REST mapper: %v\n", err)
 		klog.Fatalf("unable to construct discovery REST mapper: %v", err)
 	}
 

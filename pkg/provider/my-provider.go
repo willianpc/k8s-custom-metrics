@@ -11,14 +11,8 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/metrics/pkg/apis/custom_metrics"
 
-	// "k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	// "k8s.io/apimachinery/pkg/labels"
-	// "k8s.io/apimachinery/pkg/runtime/schema"
-	// "k8s.io/apimachinery/pkg/types"
-	// "k8s.io/client-go/dynamic"
-	// "k8s.io/metrics/pkg/apis/custom_metrics"
-	// "sigs.k8s.io/custom-metrics-apiserver/pkg/provider"
+	_ "k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
 	"sigs.k8s.io/custom-metrics-apiserver/pkg/provider"
 	"sigs.k8s.io/custom-metrics-apiserver/pkg/provider/defaults"
@@ -85,10 +79,12 @@ func (p *yourProvider) GetMetricBySelector(ctx context.Context, namespace string
 
 // valueFor fetches a value from the fake list and increments it.
 func (p *yourProvider) valueFor(info provider.CustomMetricInfo) (int64, error) {
+	log.Println("valueFor", info)
 	// normalize the value so that you treat plural resources and singular
 	// resources the same (e.g. pods vs pod)
 	info, _, err := info.Normalized(p.mapper)
 	if err != nil {
+		log.Println("valueFor:error", err)
 		return 0, err
 	}
 

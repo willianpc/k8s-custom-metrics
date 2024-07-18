@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: custom-metrics-apiserver
+  name: custom-metrics-apiserver
+  namespace: custom-metrics
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: custom-metrics-apiserver
+  template:
+    metadata:
+      labels:
+        app: custom-metrics-apiserver
+      name: custom-metrics-apiserver
+    spec:
+      serviceAccountName: custom-metrics-apiserver
+      containers:
+      - name: custom-metrics-apiserver
+        image: homelab:5000/metrics-provider:latest
+        # image: REGISTRY/k8s-test-metrics-adapter-amd64:latest
+        imagePullPolicy: Always
+        args:
+        - /app/mp
+        - --secure-port=6443
+        - --cert-dir=/var/run/serving-cert
+        - --v=10
+        ports:
+        - containerPort: 6443
+          name: https
+        - containerPort: 8080
+          name: http
+        volumeMounts:
+        - mountPath: /tmp
+          name: temp-vol
+          readOnly: false
+        - mountPath: /var/run/serving-cert
+          name: volume-serving-cert
+          readOnly: false
+      volumes:
+      - name: temp-vol
+        emptyDir: {}
+      - name: volume-serving-cert
+        emptyDir: {}
